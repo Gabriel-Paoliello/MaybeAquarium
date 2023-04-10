@@ -3,7 +3,7 @@
 import time
 import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
-from Especies import Especie, EspecieFactory
+from Species import Specie, SpecieFactory
 from pygame import Surface
 
 def main():
@@ -13,7 +13,7 @@ def main():
     screen: Surface = pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT))
     
 
-    individuos:list(Especie) = EspecieFactory.make_especie_list()
+    individuos:list(Specie) = SpecieFactory.make_specie_list()
     # Run until the user asks to quit
     running = True
 
@@ -37,7 +37,7 @@ def main():
 
 def process(individuos:list):
     for individuo in individuos:
-        individuo: Especie = individuo
+        individuo: Specie = individuo
         individuo.walk()
 
 def print_screen(screen: Surface, individuos:list):
@@ -47,7 +47,7 @@ def print_screen(screen: Surface, individuos:list):
     # Fill the background with white
     screen.fill((255, 255, 255))
     for individuo in individuos:
-        individuo: Especie = individuo
+        individuo: Specie = individuo
         individuo.draw_self(screen, species_surfice)
         screen.blit(species_surfice, (0,0))
         #pygame.draw.circle(screen, (random.randint(0,255), random.randint(0,255), 255), radius=10, center=(individuo.get_pos_x(), individuo.get_pos_y()))

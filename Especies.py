@@ -4,7 +4,7 @@ from pygame import Surface
 import pygame
 from math import sin, cos, radians
 
-class Especie:
+class Specie:
     def __init__(self, sense, speed, angle, age, pos) -> None:
         self.sense:int = sense
         self.speed:int = speed
@@ -40,7 +40,7 @@ class Especie:
     def draw_self(self, sense_surfice: Surface, species_surfice: Surface):
         pass
 
-class EspecieX(Especie):
+class SpecieWanderer(Specie):
     def __init__(self) -> None:
         super().__init__(
             sense = random.randint(1,3),
@@ -71,11 +71,11 @@ class EspecieX(Especie):
         # Individuo
         pygame.draw.circle(species_surfice, (40*self.get_speed(), 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
 
-class EspecieFactory():
-    def make_especie_list() -> list:
-        # especie = random.choice({EspecieX.__class__, })
+class SpecieFactory():
+    def make_specie_list() -> list:
+        # specie = random.choice({SpecieX.__class__, })
         individuos:list = []
         for x in range(0, 10):
-            individuos.append(EspecieX())
+            individuos.append(SpecieWanderer())
         return individuos
                 
