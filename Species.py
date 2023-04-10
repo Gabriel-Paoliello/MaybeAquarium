@@ -71,11 +71,67 @@ class SpecieWanderer(Specie):
         # Individuo
         pygame.draw.circle(species_surfice, (40*self.get_speed(), 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
 
+class SpecieJumper(Specie):
+    def __init__(self) -> None:
+        super().__init__(
+            sense = random.randint(1,3),
+            speed = 0,
+            angle = random.randint(0,359),
+            age = 0,
+            pos = (random.randint(20, SCR_WIDTH), random.randint(20, SCR_HEIGHT))
+        )
+        self.jump_height = 0
+        self.max_jump_height = 10
+        self.is_going_up = True
+
+    def __increase_speed(self):
+        self.speed += 1
+
+    def __decrease_speed(self):
+        self.speed -= 1
+
+    def walk(self):
+        if (self.get_pos_y() >= SCR_HEIGHT or self.get_pos_y() <= 0 or
+            self.get_pos_x() >= SCR_WIDTH or self.get_pos_x() <= 0):
+            self.set_angle(self.get_angle() + 180)
+        else:
+            if self.jump_height <= 0:
+                self.is_going_up = True
+                new_jump_angle = random.randint(0,360)
+                self.set_angle(new_jump_angle)
+        
+        if self.is_going_up and (self.jump_height >= self.max_jump_height):
+            self.is_going_up = False
+        elif (not self.is_going_up) and (self.jump_height <= 0):
+            self.is_going_up = True
+
+        if self.is_going_up:
+            self.jump_height += 1
+            self.__increase_speed()
+        else:
+            self.jump_height -= 1
+            self.__decrease_speed()
+
+        angle_radians = radians(self.get_angle())
+        step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
+        step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
+        self.pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)
+        
+
+    def draw_self(self, sense_surfice: Surface, species_surfice: Surface):
+        # Sentido
+        pygame.draw.circle(sense_surfice, (217,217,217), radius=40*self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
+
+        # Individuo
+        pygame.draw.circle(species_surfice, (40, 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
+
+
 class SpecieFactory():
     def make_specie_list() -> list:
         # specie = random.choice({SpecieX.__class__, })
         individuos:list = []
-        for x in range(0, 10):
+        for x in range(0, 5):
             individuos.append(SpecieWanderer())
+            individuos.append(SpecieJumper())
         return individuos
                 
