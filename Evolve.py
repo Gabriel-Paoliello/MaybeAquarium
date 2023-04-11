@@ -1,10 +1,8 @@
-
-
 import time
 import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
-from Species import Specie, SpecieFactory
-from Foods import Food, FoodFactory
+from Models.Species import Specie, SpecieFactory
+from Models.Foods import Food, FoodFactory
 from pygame import Surface
 
 def main():
@@ -13,7 +11,6 @@ def main():
     # Set up the drawing window
     screen: Surface = pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT))
     
-
     specimens:list(Specie) = SpecieFactory.make_specie_list()
     foods:list(Food) = FoodFactory.make_food_list()
     ticks = 0
@@ -49,7 +46,6 @@ def process(specimens:list):
         specimen.walk()
 
 def print_screen(screen: Surface, specimens:list, foods:list):
-    
     species_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)
     species_surface = species_surface.convert_alpha()
     # Fill the background with white
@@ -61,7 +57,6 @@ def print_screen(screen: Surface, specimens:list, foods:list):
         food.draw_self(species_surface)
     screen.blit(species_surface, (0,0))
     #pygame.draw.circle(screen, (random.randint(0,255), random.randint(0,255), 255), radius=10, center=(specimen.get_pos_x(), specimen.get_pos_y()))
-
     
     # Flip the display
     pygame.display.flip()

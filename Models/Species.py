@@ -4,6 +4,8 @@ from pygame import Surface
 import pygame
 from math import sin, cos, radians
 
+from Models.Entinty import Entity
+
 class SpecieFactory():
     def make_specie_list() -> list:
         specimens:list = []
@@ -12,7 +14,7 @@ class SpecieFactory():
             specimens.append(SpecieJumper())
         return specimens
 
-class Specie:
+class Specie(Entity):
     def __init__(self, 
             sense = None,
             speed = None,
@@ -20,6 +22,7 @@ class Specie:
             age = None,
             pos = None,
         ) -> None:
+        super().__init__()
         if sense is None:    
             sense = random.randint(1,3)
         if speed is None:    
@@ -28,21 +31,12 @@ class Specie:
             angle = random.randint(0,359)
         if age is None:    
             age = 0
-        if pos is None:    
-            pos = (random.randint(MARGIN, SCR_WIDTH - MARGIN), random.randint(MARGIN, SCR_HEIGHT - MARGIN))
 
         self._sense:int = sense
         self._speed:int = speed
         self._angle:int = angle
         self._age:int = age
-        self._pos:tuple(int,int) = pos
-
-    def get_pos_x(self) -> int:
-        return self._pos[0]
-
-    def get_pos_y(self) -> int:
-        return self._pos[1]
-
+        
     def get_sense(self) -> int:
         return self._sense
         
@@ -84,14 +78,15 @@ class SpecieWanderer(Specie):
 
     def draw_self(self, sense_surface: Surface, species_surface: Surface):
         # Sentido
-        pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
+        pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=self.get_pos_tuple()) 
         # Individuo
-        pygame.draw.circle(species_surface, (40*self.get_speed(), 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
-
+        pygame.draw.circle(species_surface, (40*self.get_speed(), 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=self.get_pos_tuple())
+        
         angle_radians = radians(self.get_angle())
-        point_x = self.get_pos_x() + cos(angle_radians)*40*self.get_sense()
-        point_y = self.get_pos_y() + sin(angle_radians)*40*self.get_sense()
-        pygame.draw.line(sense_surface, (0,0,0),(self.get_pos_x(), self.get_pos_y()), (point_x, point_y))
+        point_x = cos(angle_radians)*40*self.get_sense() + self.get_pos_x()
+        point_y = sin(angle_radians)*40*self.get_sense() + self.get_pos_y() 
+
+        pygame.draw.line(sense_surface, (0,0,0), self.get_pos_tuple(), (point_x, point_y))
 
 class SpecieJumper(Specie):
     def __init__(self) -> None:
@@ -136,5 +131,4 @@ class SpecieJumper(Specie):
         pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
         # Individuo
         pygame.draw.circle(species_surface, (40, 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
-
-             
+        
