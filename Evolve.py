@@ -42,14 +42,14 @@ def process(individuos:list):
 
 def print_screen(screen: Surface, individuos:list):
     
-    species_surfice = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)
-    species_surfice = species_surfice.convert_alpha()
+    species_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)
+    species_surface = species_surface.convert_alpha()
     # Fill the background with white
     screen.fill((255, 255, 255))
     for individuo in individuos:
         individuo: Specie = individuo
-        individuo.draw_self(screen, species_surfice)
-        screen.blit(species_surfice, (0,0))
+        individuo.draw_self(screen, species_surface)
+        screen.blit(species_surface, (0,0))
         #pygame.draw.circle(screen, (random.randint(0,255), random.randint(0,255), 255), radius=10, center=(individuo.get_pos_x(), individuo.get_pos_y()))
 
     
