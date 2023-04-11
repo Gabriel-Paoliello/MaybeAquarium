@@ -1,5 +1,5 @@
 import random
-from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT
+from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT, MARGIN
 from pygame import Surface
 import pygame
 from math import sin, cos, radians
@@ -47,12 +47,12 @@ class SpecieWanderer(Specie):
             speed = random.randint(1,3),
             angle = random.randint(0,359),
             age = 0,
-            pos = (random.randint(20, SCR_WIDTH), random.randint(20, SCR_HEIGHT))
+            pos = (random.randint(MARGIN, SCR_WIDTH - MARGIN), random.randint(MARGIN, SCR_HEIGHT - MARGIN))
         )
 
-    def walk(self):
-        if (self.get_pos_y() >= SCR_HEIGHT or self.get_pos_y() <= 0 or
-            self.get_pos_x() >= SCR_WIDTH or self.get_pos_x() <= 0):
+    def walk(self) -> None:
+        if (self.get_pos_y() >= SCR_HEIGHT - MARGIN or self.get_pos_y() <= MARGIN or
+            self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN):
             self.set_angle(self.get_angle() + 180)
         else:
             var_angle = random.randint(-5,5)
@@ -78,38 +78,33 @@ class SpecieJumper(Specie):
             speed = 0,
             angle = random.randint(0,359),
             age = 0,
-            pos = (random.randint(20, SCR_WIDTH), random.randint(20, SCR_HEIGHT))
+            pos = (random.randint(MARGIN, SCR_WIDTH - MARGIN), random.randint(MARGIN, SCR_HEIGHT - MARGIN))
         )
-        self.jump_height = 0
-        self.max_jump_height = 10
-        self.is_going_up = True
+        self.max_speed = 7
+        self.wait_ticks = random.randint(10,30)
+        self.current_wait_ticks = 0
 
-    def __increase_speed(self):
-        self.speed += 1
+    def __set_max_speed(self):
+        self.speed = self.max_speed
 
     def __decrease_speed(self):
-        self.speed -= 1
+        self.speed -= 0.25
 
     def walk(self):
-        if (self.get_pos_y() >= SCR_HEIGHT or self.get_pos_y() <= 0 or
-            self.get_pos_x() >= SCR_WIDTH or self.get_pos_x() <= 0):
+        if self.current_wait_ticks > 0:
+            self.current_wait_ticks -= 1
+            return 
+        if (self.get_pos_y() >= SCR_HEIGHT - MARGIN or self.get_pos_y() <= MARGIN or
+            self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN):
             self.set_angle(self.get_angle() + 180)
         else:
-            if self.jump_height <= 0:
-                self.is_going_up = True
+            if self.speed <= 0:
+                self.current_wait_ticks = self.wait_ticks
                 new_jump_angle = random.randint(0,360)
+                self.__set_max_speed()
                 self.set_angle(new_jump_angle)
+                return
         
-        if self.is_going_up and (self.jump_height >= self.max_jump_height):
-            self.is_going_up = False
-        elif (not self.is_going_up) and (self.jump_height <= 0):
-            self.is_going_up = True
-
-        if self.is_going_up:
-            self.jump_height += 1
-            self.__increase_speed()
-        else:
-            self.jump_height -= 1
             self.__decrease_speed()
 
         angle_radians = radians(self.get_angle())
@@ -130,7 +125,7 @@ class SpecieFactory():
     def make_specie_list() -> list:
         # specie = random.choice({SpecieX.__class__, })
         individuos:list = []
-        for x in range(0, 5):
+        for x in range(0, 12):
             individuos.append(SpecieWanderer())
             individuos.append(SpecieJumper())
         return individuos
