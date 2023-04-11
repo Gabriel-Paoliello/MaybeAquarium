@@ -6,12 +6,11 @@ from math import sin, cos, radians
 
 class SpecieFactory():
     def make_specie_list() -> list:
-        individuos:list = []
-        for x in range(0, 12):
-            individuos.append(SpecieWanderer())
-            individuos.append(SpecieJumper())
-        return individuos
-
+        specimens:list = []
+        for _ in range(0, 12):
+            specimens.append(SpecieWanderer())
+            specimens.append(SpecieJumper())
+        return specimens
 
 class Specie:
     def __init__(self, 
@@ -86,9 +85,13 @@ class SpecieWanderer(Specie):
     def draw_self(self, sense_surface: Surface, species_surface: Surface):
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
-
         # Individuo
         pygame.draw.circle(species_surface, (40*self.get_speed(), 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
+
+        angle_radians = radians(self.get_angle())
+        point_x = self.get_pos_x() + cos(angle_radians)*40*self.get_sense()
+        point_y = self.get_pos_y() + sin(angle_radians)*40*self.get_sense()
+        pygame.draw.line(sense_surface, (0,0,0),(self.get_pos_x(), self.get_pos_y()), (point_x, point_y))
 
 class SpecieJumper(Specie):
     def __init__(self) -> None:
@@ -131,7 +134,6 @@ class SpecieJumper(Specie):
     def draw_self(self, sense_surface: Surface, species_surface: Surface):
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
-
         # Individuo
         pygame.draw.circle(species_surface, (40, 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
 

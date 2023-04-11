@@ -29,11 +29,11 @@
 # -- Idade e Reprodução -- #
 - Aplicar idade e modificar a cor dependendo da idade (Alterar algum dos RGB para isso)
 - Aplicar reprodução (Se dois indivíduos que cumpram com os critérios de reprodução [Talvez fome > 5],
-- uma marca seria realizada em ambos com o "id" dos dois individuos e as características de cada um seriam salvas,
+- uma marca seria realizada em ambos com o "id" dos dois specimens e as características de cada um seriam salvas,
 - Ambos tentam ir para a direção do outro.
 - Na movimentação para o outro, se tornam inalvejados para fome, idade e predadores [Para evitar bugs de morte no meio do processo] e geram um novo indivíduo na mesma posição.
 - Os 3 indivíduos não conseguirão reproduzir por X tempo
-- O individuo criado deverá ter as características aleatórias herdada dos pais (calculo explicado abaixo) )
+- O specimen criado deverá ter as características aleatórias herdada dos pais (calculo explicado abaixo) )
 
 
 -  Cálculo de reprodução (Discutir matemática com amiguinhos e ver a opinião de cálculo deles):
