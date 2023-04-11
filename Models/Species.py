@@ -4,7 +4,7 @@ from pygame import Surface
 import pygame
 from math import sin, cos, radians
 
-from Models.Entinty import Entity
+from Entity import Entity
 
 class SpecieFactory():
     def make_specie_list() -> list:
