@@ -1,6 +1,7 @@
 import time
 import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
+from Models.Entity import Entity
 from Models.Specimens import Specimen, SpecimenFactory
 from Models.Foods import Food, FoodFactory
 from pygame import Surface
@@ -40,10 +41,11 @@ def main():
     # Done! Time to quit.
     pygame.quit()
 
-def process(specimens:list):
-    for specimen in specimens:
-        specimen: Specimen = specimen
+def process(entities:list):
+    for entity in entities:
+        specimen: Specimen = entity
         specimen.walk()
+        specimen.look_around(entities)
 
 def print_screen(screen: Surface, specimens:list, foods:list):
     specimens_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)

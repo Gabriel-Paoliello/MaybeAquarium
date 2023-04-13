@@ -2,7 +2,7 @@ import random
 from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT, MARGIN
 from pygame import Surface
 import pygame
-from math import sin, cos, radians
+from math import sin, cos, radians, sqrt
 
 from Models.Entity import Entity
 
@@ -28,6 +28,7 @@ class Specimen(Entity):
             angle = None,
             age = None,
             pos = None,
+            color = None,
         ) -> None:
         super().__init__()
         if sense is None:    
@@ -38,11 +39,14 @@ class Specimen(Entity):
             angle = random.randint(0,359)
         if age is None:    
             age = 0
+        if color is None:
+            color = (255,0,0)
 
         self._sense:int = sense
         self._speed:int = speed
         self._angle:int = angle
         self._age:int = age
+        self._color:tuple = color
         
     def get_sense(self) -> int:
         return self._sense
@@ -56,8 +60,14 @@ class Specimen(Entity):
     def get_age(self) -> int:
         return self._age
 
+    def get_color(self) -> tuple:
+        return self._color
+
     def _set_angle(self, angle) -> None:
         self._angle = angle
+
+    def _set_color(self, color) -> None:
+        self._color = color
 
     def walk(self) -> None:
         pass
@@ -65,6 +75,8 @@ class Specimen(Entity):
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
         pass
 
+    def look_around(self, entities_list: list):
+        pass
 
 class WandererSpecimen(Specimen):
     def __init__(self) -> None:
@@ -88,7 +100,7 @@ class WandererSpecimen(Specimen):
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=self.get_pos_tuple()) 
         # Individuo
-        pygame.draw.circle(specimens_surface, (40*self.get_speed(), 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=self.get_pos_tuple())
+        pygame.draw.circle(specimens_surface, self.get_color(), radius=10, center=self.get_pos_tuple())
         
         angle_radians = radians(self.get_angle())
         point_x = cos(angle_radians)*40*self.get_sense() + self.get_pos_x()
@@ -96,9 +108,20 @@ class WandererSpecimen(Specimen):
 
         pygame.draw.line(sense_surface, (0,0,0), self.get_pos_tuple(), (point_x, point_y))
 
-    def look_around(self, specimen_list: list):
-        for specimen in specimen_list:
-            if()
+    def look_around(self, entities_list: list):
+        for entity in entities_list:
+            entity: Specimen = entity
+            if(self != entity):
+                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
+                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
+                distance = sqrt((diff_x ** 2) + (diff_y ** 2))
+                #print(distance,  self.get_sense())
+                if(distance <= (self.get_sense()*40)):
+                    self._set_color((random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+                    #print(self.get_color())
+            #else:
+            #    self._set_color((255,0,0))
+            #    print("Not Collision")
         
 
 class JumperSpecimen(Specimen):
@@ -143,5 +166,7 @@ class JumperSpecimen(Specimen):
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=40*self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
         # Individuo
-        pygame.draw.circle(specimens_surface, (40, 40*self.get_sense(), 255-40*self.get_age()), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
+        pygame.draw.circle(specimens_surface, self.get_color(), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
         
+    def look_around(self, entities_list: list):
+        pass

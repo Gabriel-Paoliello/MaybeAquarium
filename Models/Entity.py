@@ -19,18 +19,3 @@ class Entity():
         return ( self.get_pos_x(), self.get_pos_y() )
     
 
-class EntityRepository():
-    entities_list = list() #TODO Verificar Performance de dicionarios
-    specimens_list = list() 
-    @staticmethod
-    def get_entities():
-        pass
-    @staticmethod
-    def add_entitie():
-        pass
-    @staticmethod
-    def remove_entitie():
-        pass
-
-class EntityCollider():
-    pass
