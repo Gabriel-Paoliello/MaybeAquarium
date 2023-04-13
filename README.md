@@ -51,4 +51,4 @@
 
 # -- Próximos Próximos passos -- #
 - Cogitar possibilidade de novas espécies serem adicionadas, com novas mecânicas e coisas criativas (Predadores, Indivíduos parados, reprodução por 3 indivíduos, movimentações diferenciadas, etc)
-- Cogitar possibilidade de mostrar no site uma tela com os dados de idade, specie, velocidade, etc em cada 
+- Cogitar possibilidade de mostrar no site uma tela com os dados de idade, specimen, velocidade, etc em cada 

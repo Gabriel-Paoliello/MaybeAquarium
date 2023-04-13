@@ -17,8 +17,8 @@ class Food():
     def get_pos_y(self) -> int:
         return self._pos[1]
     
-    def draw_self(self, species_surface: Surface):
-        pygame.draw.circle(species_surface, (246,190,0), radius=6, center=(self.get_pos_x(), self.get_pos_y())) 
+    def draw_self(self, specimens_surface: Surface):
+        pygame.draw.circle(specimens_surface, (246,190,0), radius=6, center=(self.get_pos_x(), self.get_pos_y())) 
 
 class FoodFactory():
     def make_food_list() -> list:

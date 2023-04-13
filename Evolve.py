@@ -1,7 +1,7 @@
 import time
 import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
-from Models.Species import Specie, SpecieFactory
+from Models.Specimens import Specimen, SpecimenFactory
 from Models.Foods import Food, FoodFactory
 from pygame import Surface
 
@@ -11,7 +11,7 @@ def main():
     # Set up the drawing window
     screen: Surface = pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT))
     
-    specimens:list(Specie) = SpecieFactory.make_specie_list()
+    specimens:list(Specimen) = SpecimenFactory.get_specimen_list()
     foods:list(Food) = FoodFactory.make_food_list()
     ticks = 0
     # Run until the user asks to quit
@@ -42,20 +42,20 @@ def main():
 
 def process(specimens:list):
     for specimen in specimens:
-        specimen: Specie = specimen
+        specimen: Specimen = specimen
         specimen.walk()
 
 def print_screen(screen: Surface, specimens:list, foods:list):
-    species_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)
-    species_surface = species_surface.convert_alpha()
+    specimens_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)
+    specimens_surface = specimens_surface.convert_alpha()
     # Fill the background with white
     screen.fill((255, 255, 255))
     for specimen in specimens:
-        specimen: Specie = specimen
-        specimen.draw_self(screen, species_surface)
+        specimen: Specimen = specimen
+        specimen.draw_self(screen, specimens_surface)
     for food in foods:
-        food.draw_self(species_surface)
-    screen.blit(species_surface, (0,0))
+        food.draw_self(specimens_surface)
+    screen.blit(specimens_surface, (0,0))
     #pygame.draw.circle(screen, (random.randint(0,255), random.randint(0,255), 255), radius=10, center=(specimen.get_pos_x(), specimen.get_pos_y()))
     
     # Flip the display
