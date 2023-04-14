@@ -9,11 +9,13 @@ from Models.Entity import Entity
 class SpecimenFactory():
     __specimen_list: list = None
 
+    @staticmethod
     def get_specimen_list() -> list:
         if SpecimenFactory.__specimen_list is None:
             SpecimenFactory.__specimen_list = SpecimenFactory.__make_specimen_list()
         return SpecimenFactory.__specimen_list
-
+    
+    @staticmethod
     def __make_specimen_list() -> list:
         specimens:list = []
         for _ in range(0, 12):
@@ -69,20 +71,17 @@ class Specimen(Entity):
     def _set_color(self, color) -> None:
         self._color = color
 
-    def walk(self) -> None:
-        pass
-
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
         pass
 
-    def look_around(self, entities_list: list):
+    def act(self, entities_list: list):
         pass
 
 class WandererSpecimen(Specimen):
     def __init__(self) -> None:
         super().__init__()
 
-    def walk(self) -> None:
+    def __walk(self) -> None:
         if (self.get_pos_y() >= SCR_HEIGHT - MARGIN or self.get_pos_y() <= MARGIN or
             self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN):
             self._set_angle(self.get_angle() + 180)
@@ -95,6 +94,24 @@ class WandererSpecimen(Specimen):
         step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
         self._pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)
         
+    def __look_around(self, entities_list: list):
+        for entity in entities_list:
+            entity: Specimen = entity
+            if(self != entity):
+                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
+                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
+                distance = sqrt((diff_x ** 2) + (diff_y ** 2))
+                #print(distance,  self.get_sense())
+                if(distance <= (self.get_sense()*40)):
+                    self._set_color((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+                    #print(self.get_color())
+            #else:
+            #    self._set_color((255,0,0))
+            #    print("Not Collision")
+
+    def act(self, entities):
+        self.__walk()
+        self.__look_around(entities)
 
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
         # Sentido
@@ -108,21 +125,6 @@ class WandererSpecimen(Specimen):
 
         pygame.draw.line(sense_surface, (0,0,0), self.get_pos_tuple(), (point_x, point_y))
 
-    def look_around(self, entities_list: list):
-        for entity in entities_list:
-            entity: Specimen = entity
-            if(self != entity):
-                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
-                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
-                distance = sqrt((diff_x ** 2) + (diff_y ** 2))
-                #print(distance,  self.get_sense())
-                if(distance <= (self.get_sense()*40)):
-                    self._set_color((random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-                    #print(self.get_color())
-            #else:
-            #    self._set_color((255,0,0))
-            #    print("Not Collision")
-        
 
 class JumperSpecimen(Specimen):
     def __init__(self) -> None:
@@ -139,7 +141,11 @@ class JumperSpecimen(Specimen):
     def __decrease_speed(self):
         self._speed -= 0.25
 
-    def walk(self):
+    def act(self, entities):
+        self.__walk()
+        #self.__look_around(entities)
+
+    def __walk(self):
         if self.current_wait_ticks > 0:
             self.current_wait_ticks -= 1
             return 
@@ -168,5 +174,5 @@ class JumperSpecimen(Specimen):
         # Individuo
         pygame.draw.circle(specimens_surface, self.get_color(), radius=10, center=(self.get_pos_x(), self.get_pos_y()))
         
-    def look_around(self, entities_list: list):
+    def __look_around(self, entities_list: list):
         pass

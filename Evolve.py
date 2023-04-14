@@ -44,8 +44,7 @@ def main():
 def process(entities:list):
     for entity in entities:
         specimen: Specimen = entity
-        specimen.walk()
-        specimen.look_around(entities)
+        specimen.act(entities)
 
 def print_screen(screen: Surface, specimens:list, foods:list):
     specimens_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)
