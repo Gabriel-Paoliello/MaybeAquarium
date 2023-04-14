@@ -5,8 +5,13 @@ from Models.Entity import Entity
 from Models.Specimens import Specimen, SpecimenFactory
 from Models.Foods import Food, FoodFactory
 from pygame import Surface
+from pyvirtualdisplay import Display
 
 def main():
+
+    display = Display(visible=0, size=(1600, 800))
+    display.start()
+
     # Import and initialize the pygame library
     pygame.init()
     # Set up the drawing window
