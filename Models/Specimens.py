@@ -94,11 +94,8 @@ class WandererSpecimen(Specimen):
         if(direction_degress != None):
             self._set_angle_degrees(direction_degress)
         else:
-            if (self.is_in_border()):
-                self._set_angle_degrees(self.get_angle_degrees() + 180)
-            else:
-                var_angle = random.randint(-5,5)
-                self._set_angle_degrees(self.get_angle_degrees() + var_angle)
+            var_angle = random.randint(-5,5)
+            self._set_angle_degrees(self.get_angle_degrees() + var_angle)
                 
         angle_radians = radians(self.get_angle_degrees())
         step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
@@ -120,19 +117,24 @@ class WandererSpecimen(Specimen):
 
     def __think(self, entities_in_sense: list) -> int:
         direction_degrees = None
-        for entity in entities_in_sense:
-            if(isinstance(entity, Food)):
-                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
-                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
-                angle = degrees(atan2(diff_y , diff_x))
-                direction_degrees = angle
-            elif (not isinstance(entity, type(self))):
-                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
-                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
-                angle = degrees(atan2(diff_y , diff_x))
-                direction_degrees = angle+180
-            else:
-                direction_degrees = None
+        var_angle = random.randint(-5,5)
+        if (self.is_in_border()):
+            direction_degrees = self.get_angle_degrees() + 180 + var_angle
+        else:
+            for entity in entities_in_sense:
+                if(isinstance(entity, type(self))):
+                    diff_x = self.get_pos_x() - entity.get_pos_x()
+                    diff_y = self.get_pos_y() - entity.get_pos_y()
+                    angle = degrees(atan2(diff_y , diff_x))
+                    direction_degrees = angle + 180 + var_angle
+                elif (not isinstance(entity, type(self))):
+                    diff_x = self.get_pos_x() - entity.get_pos_x()
+                    diff_y = self.get_pos_y() - entity.get_pos_y()
+                    angle = degrees(atan2(diff_y , diff_x))
+                    direction_degrees = angle + var_angle
+                else:
+                    direction_degrees = None
+        
         return direction_degrees
 
     def act(self, entities):
