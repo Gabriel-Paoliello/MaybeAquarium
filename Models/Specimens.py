@@ -1,8 +1,10 @@
 import random
 from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT, MARGIN
+from Models.Foods import Food
 from pygame import Surface
 import pygame
-from math import sin, cos, radians, sqrt
+from math import sin, cos, degrees, radians, sqrt, atan2
+
 
 from Models.Entity import Entity
 
@@ -46,7 +48,7 @@ class Specimen(Entity):
 
         self._sense:int = sense
         self._speed:int = speed
-        self._angle:int = angle
+        self._angle_degress:int = angle
         self._age:int = age
         self._color:tuple = color
         
@@ -56,8 +58,8 @@ class Specimen(Entity):
     def get_speed(self) -> int:
         return self._speed
 
-    def get_angle(self) -> int:
-        return self._angle
+    def get_angle_degrees(self) -> int:
+        return self._angle_degress
 
     def get_age(self) -> int:
         return self._age
@@ -65,8 +67,8 @@ class Specimen(Entity):
     def get_color(self) -> tuple:
         return self._color
 
-    def _set_angle(self, angle) -> None:
-        self._angle = angle
+    def _set_angle_degrees(self, angle) -> None:
+        self._angle_degress = angle % 360
 
     def _set_color(self, color) -> None:
         self._color = color
@@ -74,6 +76,11 @@ class Specimen(Entity):
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
         pass
 
+    def is_in_border(self) -> bool:
+        is_in_border_y = self.get_pos_y() >= SCR_HEIGHT - MARGIN or self.get_pos_y() <= MARGIN 
+        is_in_border_x = self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN
+        return is_in_border_y or is_in_border_x
+    
     def act(self, entities_list: list):
         pass
 
@@ -81,37 +88,56 @@ class WandererSpecimen(Specimen):
     def __init__(self) -> None:
         super().__init__()
 
-    def __walk(self) -> None:
-        if (self.get_pos_y() >= SCR_HEIGHT - MARGIN or self.get_pos_y() <= MARGIN or
-            self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN):
-            self._set_angle(self.get_angle() + 180)
-        else:
-            var_angle = random.randint(-5,5)
-            self._set_angle(self.get_angle() + var_angle)
+    # walks in a random direction or in a forced direction by the direction_degress arg
+    def __walk(self, direction_degress = None) -> None:
 
-        angle_radians = radians(self.get_angle())
+        if(direction_degress != None):
+            self._set_angle_degrees(direction_degress)
+        else:
+            if (self.is_in_border()):
+                self._set_angle_degrees(self.get_angle_degrees() + 180)
+            else:
+                var_angle = random.randint(-5,5)
+                self._set_angle_degrees(self.get_angle_degrees() + var_angle)
+                
+        angle_radians = radians(self.get_angle_degrees())
         step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
         step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
         self._pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)
-        
-    def __look_around(self, entities_list: list):
+    
+    def __look_around(self, entities_list: list) -> list:
+        entities_in_sense = []
         for entity in entities_list:
             entity: Specimen = entity
             if(self != entity):
-                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
-                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
+                diff_x = self.get_pos_x() - entity.get_pos_x()
+                diff_y = self.get_pos_y() - entity.get_pos_y()
                 distance = sqrt((diff_x ** 2) + (diff_y ** 2))
                 #print(distance,  self.get_sense())
                 if(distance <= (self.get_sense()*40)):
-                    self._set_color((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
-                    #print(self.get_color())
-            #else:
-            #    self._set_color((255,0,0))
-            #    print("Not Collision")
+                    entities_in_sense.append(entity)
+        return entities_in_sense
+
+    def __think(self, entities_in_sense: list) -> int:
+        direction_degrees = None
+        for entity in entities_in_sense:
+            if(isinstance(entity, Food)):
+                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
+                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
+                angle = degrees(atan2(diff_y , diff_x))
+                direction_degrees = angle
+            elif (not isinstance(entity, type(self))):
+                diff_x = abs(self.get_pos_x() - entity.get_pos_x())
+                diff_y = abs(self.get_pos_y() - entity.get_pos_y())
+                angle = degrees(atan2(diff_y , diff_x))
+                direction_degrees = angle+180
+            else:
+                direction_degrees = None
+        return direction_degrees
 
     def act(self, entities):
-        self.__walk()
-        self.__look_around(entities)
+        self.__walk(self.__think(self.__look_around(entities)))
+        
 
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
         # Sentido
@@ -119,7 +145,7 @@ class WandererSpecimen(Specimen):
         # Individuo
         pygame.draw.circle(specimens_surface, self.get_color(), radius=10, center=self.get_pos_tuple())
         
-        angle_radians = radians(self.get_angle())
+        angle_radians = radians(self.get_angle_degrees())
         point_x = cos(angle_radians)*40*self.get_sense() + self.get_pos_x()
         point_y = sin(angle_radians)*40*self.get_sense() + self.get_pos_y() 
 
@@ -151,18 +177,18 @@ class JumperSpecimen(Specimen):
             return 
         if (self.get_pos_y() >= SCR_HEIGHT - MARGIN or self.get_pos_y() <= MARGIN or
             self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN):
-            self._set_angle(self.get_angle() + 180)
+            self._set_angle_degrees(self.get_angle_degrees() + 180)
         else:
             if self._speed <= 0:
                 self.current_wait_ticks = self.wait_ticks
                 new_jump_angle = random.randint(0,360)
                 self.__set_max_speed()
-                self._set_angle(new_jump_angle)
+                self._set_angle_degrees(new_jump_angle)
                 return
         
             self.__decrease_speed()
 
-        angle_radians = radians(self.get_angle())
+        angle_radians = radians(self.get_angle_degrees())
         step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
         step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
         self._pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)

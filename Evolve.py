@@ -9,8 +9,8 @@ from pyvirtualdisplay import Display
 
 def main():
 
-    display = Display(visible=0, size=(1600, 800))
-    display.start()
+    #display = Display(visible=0, size=(SCR_WIDTH, SCR_HEIGHT))
+    #display.start()
 
     # Import and initialize the pygame library
     pygame.init()
