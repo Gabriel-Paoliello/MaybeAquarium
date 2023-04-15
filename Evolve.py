@@ -2,10 +2,11 @@ import time
 import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
 from Models.Entity import Entity
-from Models.Specimens import Specimen, SpecimenFactory
-from Models.Foods import Food, FoodFactory
+from Models.Specimens import Specimen
+from Models.EntityManager import EntityFactory
+from Models.Foods import Food
 from pygame import Surface
-from pyvirtualdisplay import Display
+#from pyvirtualdisplay import Display
 
 def main():
 
@@ -17,8 +18,8 @@ def main():
     # Set up the drawing window
     screen: Surface = pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT))
     
-    specimens:list(Specimen) = SpecimenFactory.get_specimen_list()
-    foods:list(Food) = FoodFactory.make_food_list()
+    specimens:list = EntityFactory.build_specimen_list(20)
+    foods:list = EntityFactory.build_food_list(10)
     ticks = 0
     # Run until the user asks to quit
     running = True

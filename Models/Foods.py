@@ -4,11 +4,13 @@ import pygame
 import random
 
 class Food():
+    body_radius = STEP_SIZE * 5
     __spawn_ticks = 100 
     def __init__(self) -> None:
         self._pos = (random.randint(20, SCR_WIDTH), random.randint(20, SCR_HEIGHT))
     
-    def get_spawn_ticks():
+    @staticmethod
+    def get_spawn_ticks() -> int:
         return Food.__spawn_ticks
 
     def get_pos_x(self) -> int:
@@ -18,11 +20,4 @@ class Food():
         return self._pos[1]
     
     def draw_self(self, specimens_surface: Surface):
-        pygame.draw.circle(specimens_surface, (246,190,0), radius=6, center=(self.get_pos_x(), self.get_pos_y())) 
-
-class FoodFactory():
-    def make_food_list() -> list:
-        food:list = []
-        for _ in range(0, 10):
-            food.append(Food())
-        return food
+        pygame.draw.circle(specimens_surface, (246,190,0), radius=Food.body_radius, center=(self.get_pos_x(), self.get_pos_y())) 
