@@ -21,30 +21,7 @@ class EntityFactory():
     @staticmethod
     def build_food() -> Food:
         return Food()
-
-class EntityRepository():
-    entities_list = list() 
-    specimens_list = list() 
-    @staticmethod
-    def get_entities():
-        return EntityRepository.entities_list
     
-    @staticmethod
-    def get_specimens():
-        return EntityRepository.specimens_list
-    
-    @staticmethod
-    def add_entitie(entity: Entity):
-        EntityRepository.entities_list.append(entity)
-        if isinstance(entity, Specimen):
-           EntityRepository.specimens_list.append(entity)
-
-    @staticmethod
-    def remove_entitie(entity: Entity):
-        EntityRepository.entities_list.remove(entity)
-        if isinstance(entity, Specimen):
-           EntityRepository.specimens_list.remove(entity)
-
 class EntityCollider():
     @staticmethod
     def is_entity_colliding(entity1: Entity, entity2: Entity) -> bool:
