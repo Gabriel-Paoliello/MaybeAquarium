@@ -1,12 +1,15 @@
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # removes hello from pygame
+
 import time
-import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
 from Models.Entity import Entity
 from Models.Specimens import Specimen
 from Models.EntityFactory import EntityFactory
 from Models.Foods import Food
+import pygame
 from pygame import Surface
-#from pyvirtualdisplay import Display
+
 
 class FPSManager():
     def __init__(self, frames_per_second: int) -> None:
@@ -25,10 +28,9 @@ class FPSManager():
     def get_frames_since_start(self) -> int:
         return self.__frames_since_start
     
-def main():
-    #display = Display(visible=0, size=(SCR_WIDTH, SCR_HEIGHT))
-    #display.start()
-    
+def run():
+
+
     # Initialize the pygame library
     pygame.init()
     # Set up the drawing window
@@ -76,5 +78,3 @@ def display_screen(screen: Surface, specimens:list, foods:list):
     
     # Flip the display
     pygame.display.flip()
-
-main()
