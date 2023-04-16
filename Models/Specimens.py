@@ -4,6 +4,8 @@ from pygame import Surface
 import pygame
 from math import sin, cos, degrees, radians, sqrt, atan2
 
+from Models.PositionChecker import PositionChecker
+
 from Models.Entity import Entity
 
 class Specimen(Entity):
@@ -14,7 +16,6 @@ class Specimen(Entity):
             speed = None,
             angle = None,
             age = None,
-            pos = None,
             color = None,
         ) -> None:
         super().__init__()
@@ -72,14 +73,8 @@ class WandererSpecimen(Specimen):
         super().__init__()
 
     # walks in a random direction or in a forced direction by the direction_degress arg
-    def __walk(self, direction_degress = None) -> None:
-
-        if(direction_degress != None):
-            self._set_angle_degrees(direction_degress)
-        else:
-            var_angle = random.randint(-5,5)
-            self._set_angle_degrees(self.get_angle_degrees() + var_angle)
-                
+    def __walk(self, direction_degress: int) -> None:
+        self._set_angle_degrees(direction_degress)
         angle_radians = radians(self.get_angle_degrees())
         step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
         step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
@@ -90,34 +85,41 @@ class WandererSpecimen(Specimen):
         for entity in entities_list:
             entity: Specimen = entity
             if(self != entity):
-                diff_x = self.get_pos_x() - entity.get_pos_x()
-                diff_y = self.get_pos_y() - entity.get_pos_y()
-                distance = sqrt((diff_x ** 2) + (diff_y ** 2))
-                if(distance <= (self.get_sense())):
+                is_in_sense = PositionChecker.is_circles_colliding(
+                                    self.get_pos_x(), self.get_pos_y(), self.get_sense(), 
+                                    entity.get_pos_x(), entity.get_pos_y(), entity.BODY_RADIUS 
+                                )
+                if(is_in_sense):
                     entities_in_sense.append(entity)
         return entities_in_sense
 
-    def __think(self, entities_in_sense: list) -> int | None:
-        direction_degrees = None
+    def __think(self, entities_in_sense: list) -> int:
         if (self.is_in_border()):
             direction_degrees = self.get_angle_degrees() + 180
         else:
+            maybe_direction_degrees: int | None = None
             var_angle = random.randint(-5,5)
             for entity in entities_in_sense:
-                diff_x = self.get_pos_x() - entity.get_pos_x()
-                diff_y = self.get_pos_y() - entity.get_pos_y()
-                angle = degrees(atan2(diff_y, diff_x))
+                angle = PositionChecker.calculate_degrees_between_points(
+                            self.get_pos_x(), self.get_pos_y(),
+                            entity.get_pos_x(), entity.get_pos_y()
+                        )
                 if(isinstance(entity, type(self))):
-                    direction_degrees = int(angle + var_angle + 180) #TODO lembrar de arrumar x y ou y x
-                elif (not isinstance(entity, type(self))):
-                    direction_degrees = int(angle + var_angle)
+                    maybe_direction_degrees = int(angle + var_angle + 180) #TODO lembrar de arrumar x y ou y x
                 else:
-                    direction_degrees = None
-        
+                    maybe_direction_degrees = int(angle + var_angle)
+            if maybe_direction_degrees == None:
+                direction_degrees = self.get_angle_degrees() + var_angle
+            else:
+                direction_degrees = maybe_direction_degrees
+                    
+        self._set_angle_degrees(direction_degrees)
         return direction_degrees
 
     def act(self, entities):
-        self.__walk(self.__think(self.__look_around(entities)))
+        entities_in_sense = self.__look_around(entities)
+        angle_decided = self.__think(entities_in_sense)
+        self.__walk(angle_decided)
         
 
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
@@ -131,7 +133,6 @@ class WandererSpecimen(Specimen):
         point_y = sin(angle_radians)*self.get_sense() + self.get_pos_y() 
 
         pygame.draw.line(sense_surface, (0,0,0), self.get_pos_tuple(), (point_x, point_y))
-
 
 class JumperSpecimen(Specimen):
     def __init__(self) -> None:

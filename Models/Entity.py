@@ -2,7 +2,7 @@ from random import randint
 from Consts import MARGIN, SCR_HEIGHT, SCR_WIDTH
 
 class Entity():
-    BODY_RADIUS: int | None = None
+    BODY_RADIUS: int = 0
 
     def __init__(self,
             pos = None,

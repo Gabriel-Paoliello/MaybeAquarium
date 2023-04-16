@@ -3,7 +3,7 @@ import pygame
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
 from Models.Entity import Entity
 from Models.Specimens import Specimen
-from Models.EntityManager import EntityFactory
+from Models.EntityFactory import EntityFactory
 from Models.Foods import Food
 from pygame import Surface
 #from pyvirtualdisplay import Display
