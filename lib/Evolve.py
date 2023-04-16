@@ -3,10 +3,10 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # removes hello from pygame
 
 import time
 from Consts import SCR_HEIGHT, SCR_WIDTH, FPS
-from Models.Entity import Entity
-from Models.Specimens import Specimen
-from Models.EntityFactory import EntityFactory
-from Models.Foods import Food
+from models.Entity import Entity
+from models.Specimens import Specimen
+from models.EntityFactory import EntityFactory
+from models.Foods import Food
 import pygame
 from pygame import Surface
 

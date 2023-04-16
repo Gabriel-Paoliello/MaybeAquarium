@@ -4,9 +4,9 @@ from pygame import Surface
 import pygame
 from math import sin, cos, degrees, radians, sqrt, atan2
 
-from Models.PositionChecker import PositionChecker
+from models.PositionChecker import PositionChecker
 
-from Models.Entity import Entity
+from models.Entity import Entity
 
 class Specimen(Entity):
     BODY_RADIUS: int = int(STEP_SIZE * 10)

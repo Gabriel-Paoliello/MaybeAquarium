@@ -10,9 +10,14 @@ def main():
     config = vars(args)
     
     if config["env"] == "prod":
-        from pyvirtualdisplay.display import Display
-        display = Display(visible=False, size=(SCR_WIDTH, SCR_HEIGHT))
-        display.start()
-
+        try:
+            from pyvirtualdisplay.display import Display
+            display = Display(visible=False, size=(SCR_WIDTH, SCR_HEIGHT))
+            display.start()
+        except:
+            print("Dependency pyvirtualdisplay is missing.")
+            exit()
+            
     Evolve.run()
-main()
+if __name__ == "__main__":
+    main()

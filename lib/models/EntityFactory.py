@@ -1,6 +1,6 @@
-from Models.Entity import Entity
-from Models.Specimens import Specimen, JumperSpecimen, WandererSpecimen
-from Models.Foods import Food
+from models.Entity import Entity
+from models.Specimens import Specimen, JumperSpecimen, WandererSpecimen
+from models.Foods import Food
 
 class EntityFactory():
     @staticmethod
