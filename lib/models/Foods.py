@@ -1,4 +1,4 @@
-from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT, MARGIN
+from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT
 from pygame import Surface
 import pygame
 import random

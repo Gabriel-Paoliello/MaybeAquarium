@@ -29,8 +29,6 @@ class FPSManager():
         return self.__frames_since_start
     
 def run():
-
-
     # Initialize the pygame library
     pygame.init()
     # Set up the drawing window

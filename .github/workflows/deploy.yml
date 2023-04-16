@@ -29,7 +29,7 @@ jobs:
         pip install pyvirtualdisplay
     - name: Build and run Pygame
       run: |
-        python Evolve.py
+        python ./lib/Program.py prod
     # - name: Lint with flake8
     #   run: |
     #     # stop the build if there are Python syntax errors or undefined names
