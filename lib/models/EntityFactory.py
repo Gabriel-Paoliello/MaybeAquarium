@@ -15,7 +15,7 @@ class EntityFactory():
     def build_food_list(size: int) -> list:
         food:list = []
         while len(food) < size:
-            food.append(Food())
+            food.append(EntityFactory.build_food())
         return food
     
     @staticmethod
