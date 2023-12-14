@@ -9,7 +9,7 @@ from models.PositionChecker import PositionChecker
 from models.Entity import Entity
 
 class Specimen(Entity):
-    BODY_RADIUS: int = int(STEP_SIZE * 10)
+    __DEFAULT_BODY_RADIUS: int = int(STEP_SIZE * 10)
 
     def __init__(self, 
             sense = None,
@@ -35,7 +35,11 @@ class Specimen(Entity):
         self._angle_degress:int = angle
         self._age:int = age
         self._color:tuple = color
+        self._body_radius: int = Specimen.__DEFAULT_BODY_RADIUS
         
+    def get_body_radius(self) -> int:
+        return self._body_radius
+    
     def get_sense(self) -> int:
         return self._sense
         
@@ -72,6 +76,9 @@ class WandererSpecimen(Specimen):
     def __init__(self) -> None:
         super().__init__()
 
+    def get_body_radius(self) -> int:
+        return int(super().get_body_radius()*1.5)
+
     # walks in a random direction or in a forced direction by the direction_degress arg
     def __walk(self, direction_degress: int) -> None:
         self._set_angle_degrees(direction_degress)
@@ -80,20 +87,29 @@ class WandererSpecimen(Specimen):
         step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
         self._pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)
     
-    def __look_around(self, entities_list: list) -> list:
+    def __look_around(self, entities_list: list) -> tuple[list, list]:
         entities_in_sense = []
+        entities_in_reach = []
         for entity in entities_list:
             entity: Specimen = entity
             if(self != entity):
-                is_in_sense = PositionChecker.is_circles_colliding(
-                                    self.get_pos_x(), self.get_pos_y(), self.get_sense(), 
-                                    entity.get_pos_x(), entity.get_pos_y(), entity.BODY_RADIUS 
+                is_in_reach = PositionChecker.is_circles_colliding(
+                                    self.get_pos_x(), self.get_pos_y(), self.get_body_radius(), 
+                                    entity.get_pos_x(), entity.get_pos_y(), entity.get_body_radius() 
                                 )
-                if(is_in_sense):
+                if (is_in_reach):
+                    entities_in_reach.append(entity)
                     entities_in_sense.append(entity)
-        return entities_in_sense
+                else:
+                    is_in_sense = PositionChecker.is_circles_colliding(
+                                        self.get_pos_x(), self.get_pos_y(), self.get_sense(), 
+                                        entity.get_pos_x(), entity.get_pos_y(), entity.get_body_radius() 
+                                    )
+                    if(is_in_sense):
+                        entities_in_sense.append(entity)
+        return entities_in_reach, entities_in_sense
 
-    def __think(self, entities_in_sense: list) -> int:
+    def __choose_direction(self, entities_in_sense: list) -> int:
         if (self.is_in_border()):
             direction_degrees = self.get_angle_degrees() + 180
         else:
@@ -116,17 +132,21 @@ class WandererSpecimen(Specimen):
         self._set_angle_degrees(direction_degrees)
         return direction_degrees
 
+    def __eat(self, entities_in_sense: list):
+        pass
+
     def act(self, entities):
-        entities_in_sense = self.__look_around(entities)
-        angle_decided = self.__think(entities_in_sense)
+        entities_in_reach, entities_in_sense = self.__look_around(entities)
+        # if len(entities_in_reach) > 0:
+        #     self.__eat()
+        angle_decided = self.__choose_direction(entities_in_sense)
         self.__walk(angle_decided)
-        
 
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=self.get_sense(), center=self.get_pos_tuple()) 
         # Individuo
-        pygame.draw.circle(specimens_surface, self.get_color(), radius=WandererSpecimen.BODY_RADIUS, center=self.get_pos_tuple())
+        pygame.draw.circle(specimens_surface, self.get_color(), radius=self.get_body_radius(), center=self.get_pos_tuple())
         
         angle_radians = radians(self.get_angle_degrees())
         point_x = cos(angle_radians)*self.get_sense() + self.get_pos_x()
@@ -180,7 +200,7 @@ class JumperSpecimen(Specimen):
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
         # Individuo
-        pygame.draw.circle(specimens_surface, self.get_color(), radius=JumperSpecimen.BODY_RADIUS , center=(self.get_pos_x(), self.get_pos_y()))
+        pygame.draw.circle(specimens_surface, self.get_color(), radius=self.get_body_radius() , center=(self.get_pos_x(), self.get_pos_y()))
         
     def __look_around(self, entities_list: list):
         pass

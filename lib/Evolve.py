@@ -42,13 +42,13 @@ def run():
     while running:
         fps_manager.start_frame()
         running = not did_click_close_button()
-        process_foods(foods, fps_manager.get_frames_since_start())
+        add_foods(foods, fps_manager.get_frames_since_start())
         process_specimens(specimens)
         display_screen(screen, specimens, foods)
         fps_manager.end_frame()
     pygame.quit()
 
-def process_foods(foods: list, current_frame_count: int):
+def add_foods(foods: list, current_frame_count: int):
     if(current_frame_count%Food.get_spawn_ticks() == 0):
         foods.append(EntityFactory.build_food())
 
