@@ -3,11 +3,13 @@ from pygame import Surface
 import pygame
 import random
 
-class Food():
-    body_radius = STEP_SIZE * 5
+from models.Entity import Entity
+
+class Food(Entity):
+    __DEFAULT_BODY_RADIUS = int(STEP_SIZE * 5)
     __spawn_ticks = 100 
     def __init__(self) -> None:
-        self._pos = (random.randint(20, SCR_WIDTH), random.randint(20, SCR_HEIGHT))
+        super().__init__()
     
     @staticmethod
     def get_spawn_ticks() -> int:
@@ -19,5 +21,8 @@ class Food():
     def get_pos_y(self) -> int:
         return self._pos[1]
     
+    def get_body_radius(self) -> int:
+        return Food.__DEFAULT_BODY_RADIUS
+    
     def draw_self(self, specimens_surface: Surface):
-        pygame.draw.circle(specimens_surface, (246,190,0), radius=Food.body_radius, center=(self.get_pos_x(), self.get_pos_y())) 
+        pygame.draw.circle(specimens_surface, (246,190,0), radius=self.get_body_radius(), center=(self.get_pos_x(), self.get_pos_y())) 

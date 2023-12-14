@@ -43,7 +43,7 @@ def run():
         fps_manager.start_frame()
         running = not did_click_close_button()
         add_foods(foods, fps_manager.get_frames_since_start())
-        process_specimens(specimens)
+        process_specimens(specimens, foods)
         display_screen(screen, specimens, foods)
         fps_manager.end_frame()
     pygame.quit()
@@ -57,10 +57,10 @@ def did_click_close_button():
         if event.type == pygame.QUIT:
             return True
 
-def process_specimens(entities:list):
-    for entity in entities:
+def process_specimens(specimens: list[Specimen], foods: list[Food]):
+    for entity in specimens:
         specimen: Specimen = entity
-        specimen.act(entities)
+        specimen.act(specimens, foods)
 
 def display_screen(screen: Surface, specimens:list, foods:list):
     specimens_surface = pygame.Surface((SCR_WIDTH, SCR_HEIGHT),pygame.SRCALPHA, 32)

@@ -1,12 +1,16 @@
 import random
+from typing import TypeVar
 from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT, MARGIN
 from pygame import Surface
 import pygame
 from math import sin, cos, degrees, radians, sqrt, atan2
+from models.Foods import Food
 
 from models.PositionChecker import PositionChecker
 
 from models.Entity import Entity
+
+EntityType = TypeVar('EntityType', bound=Entity)
 
 class Specimen(Entity):
     __DEFAULT_BODY_RADIUS: int = int(STEP_SIZE * 10)
@@ -69,29 +73,17 @@ class Specimen(Entity):
         is_in_border_x = self.get_pos_x() >= SCR_WIDTH - MARGIN or self.get_pos_x() <= MARGIN
         return is_in_border_y or is_in_border_x
     
-    def act(self, entities_list: list):
+    def act(self, specimens: list['Specimen'], foods: list[Food]) -> None:
         pass
-
-class WandererSpecimen(Specimen):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def get_body_radius(self) -> int:
-        return int(super().get_body_radius()*1.5)
-
-    # walks in a random direction or in a forced direction by the direction_degress arg
-    def __walk(self, direction_degress: int) -> None:
-        self._set_angle_degrees(direction_degress)
-        angle_radians = radians(self.get_angle_degrees())
-        step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
-        step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
-        self._pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)
     
-    def __look_around(self, entities_list: list) -> tuple[list, list]:
+    def _eat(self, food: Food):
+        pass
+    
+    def _identify_close_entities(self, entities: list[EntityType]) -> tuple[list[EntityType], list[EntityType]]:
         entities_in_sense = []
         entities_in_reach = []
-        for entity in entities_list:
-            entity: Specimen = entity
+        for entity in entities:
+            entity: Entity = entity
             if(self != entity):
                 is_in_reach = PositionChecker.is_circles_colliding(
                                     self.get_pos_x(), self.get_pos_y(), self.get_body_radius(), 
@@ -109,19 +101,39 @@ class WandererSpecimen(Specimen):
                         entities_in_sense.append(entity)
         return entities_in_reach, entities_in_sense
 
-    def __choose_direction(self, entities_in_sense: list) -> int:
+class WandererSpecimen(Specimen):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def get_body_radius(self) -> int:
+        return int(super().get_body_radius()*1.5)
+
+    # walks in a random direction or in a forced direction by the direction_degress arg
+    def __walk(self, direction_degress: int) -> None:
+        self._set_angle_degrees(direction_degress)
+        angle_radians = radians(self.get_angle_degrees())
+        step_x = cos(angle_radians)*self.get_speed()*STEP_SIZE
+        step_y = sin(angle_radians)*self.get_speed()*STEP_SIZE
+        self._pos = (self.get_pos_x() + step_x, self.get_pos_y() + step_y)
+
+    def __choose_direction(self, specimens_in_sense: list[Specimen], foods_in_sense: list[Food]) -> int:
         if (self.is_in_border()):
-            direction_degrees = self.get_angle_degrees() + 180
+            direction_degrees = self.get_angle_degrees() + 90
         else:
             maybe_direction_degrees: int | None = None
             var_angle = random.randint(-5,5)
-            for entity in entities_in_sense:
+            for specimen in specimens_in_sense:
                 angle = PositionChecker.calculate_degrees_between_points(
                             self.get_pos_x(), self.get_pos_y(),
-                            entity.get_pos_x(), entity.get_pos_y()
+                            specimen.get_pos_x(), specimen.get_pos_y()
                         )
-                if(isinstance(entity, type(self))):
+                
+                #TODO add prioridade e seguir foods
+                if(isinstance(specimen, type(self))):
                     maybe_direction_degrees = int(angle + var_angle + 180) #TODO lembrar de arrumar x y ou y x
+                elif isinstance(specimen, JumperSpecimen):
+                    maybe_direction_degrees = int(angle + var_angle)
+                    break
                 else:
                     maybe_direction_degrees = int(angle + var_angle)
             if maybe_direction_degrees == None:
@@ -132,14 +144,30 @@ class WandererSpecimen(Specimen):
         self._set_angle_degrees(direction_degrees)
         return direction_degrees
 
-    def __eat(self, entities_in_sense: list):
-        pass
+    def __eat(self, food: Food):
+        super()._eat(food)
 
-    def act(self, entities):
-        entities_in_reach, entities_in_sense = self.__look_around(entities)
-        # if len(entities_in_reach) > 0:
-        #     self.__eat()
-        angle_decided = self.__choose_direction(entities_in_sense)
+    
+    def __eat_list(self, foods: list[Food]):
+        for food in foods:
+            self._eat(food)
+
+    def act(self, specimens: list[Specimen], foods: list[Food]) -> None:
+        specimens_in_reach, specimens_in_sense = self._identify_close_entities(specimens)
+        foods_in_reach, foods_in_sense = self._identify_close_entities(foods)
+        
+        if len(foods_in_reach) > 0:
+            for food in foods_in_reach:
+                self.__eat(food)
+                foods_in_reach.remove(food)
+                foods_in_sense.remove(food)
+                foods.remove(food)
+            
+        elif len(specimens_in_reach) > 0:
+            for entity in specimens_in_reach:
+                continue # TODO implement procreation
+                
+        angle_decided = self.__choose_direction(specimens_in_sense, foods_in_sense)
         self.__walk(angle_decided)
 
     def draw_self(self, sense_surface: Surface, specimens_surface: Surface):
@@ -150,7 +178,7 @@ class WandererSpecimen(Specimen):
         
         angle_radians = radians(self.get_angle_degrees())
         point_x = cos(angle_radians)*self.get_sense() + self.get_pos_x()
-        point_y = sin(angle_radians)*self.get_sense() + self.get_pos_y() 
+        point_y = sin(angle_radians)*self.get_sense() + self.get_pos_y()
 
         pygame.draw.line(sense_surface, (0,0,0), self.get_pos_tuple(), (point_x, point_y))
 
@@ -169,7 +197,7 @@ class JumperSpecimen(Specimen):
     def __decrease_speed(self):
         self._speed -= 0.25
 
-    def act(self, entities):
+    def act(self, specimens: list[Specimen], foods: list[Food]) -> None:
         self.__walk()
         #self.__look_around(entities)
 
@@ -201,6 +229,3 @@ class JumperSpecimen(Specimen):
         pygame.draw.circle(sense_surface, (217,217,217), radius=self.get_sense(), center=(self.get_pos_x(), self.get_pos_y())) 
         # Individuo
         pygame.draw.circle(specimens_surface, self.get_color(), radius=self.get_body_radius() , center=(self.get_pos_x(), self.get_pos_y()))
-        
-    def __look_around(self, entities_list: list):
-        pass
