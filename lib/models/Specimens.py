@@ -4,10 +4,9 @@ from Consts import STEP_SIZE, SCR_WIDTH, SCR_HEIGHT, MARGIN
 from pygame import Surface
 import pygame
 from math import sin, cos, degrees, radians, sqrt, atan2
+from models.MoveEntityDecision import MoveDecision, MoveEntityDecision
 from models.Foods import Food
-
 from models.PositionChecker import PositionChecker
-
 from models.Entity import Entity
 
 EntityType = TypeVar('EntityType', bound=Entity)
@@ -40,6 +39,9 @@ class Specimen(Entity):
         self._age:int = age
         self._color:tuple = color
         self._body_radius: int = Specimen.__DEFAULT_BODY_RADIUS
+        self._priority_list: list[MoveEntityDecision] = [
+            MoveEntityDecision(Specimen, MoveDecision.RUN_FROM),
+        ]
         
     def get_body_radius(self) -> int:
         return self._body_radius
