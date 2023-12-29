@@ -56,7 +56,7 @@ class Drawer():
         # Sentido
         pygame.draw.circle(sense_surface, (217,217,217), radius=specimen.get_sense(), center=specimen.get_pos_tuple()) 
         # Individuo
-        pygame.draw.circle(specimens_surface, specimen.get_color(), radius=specimen.BODY_RADIUS, center=specimen.get_pos_tuple())
+        pygame.draw.circle(specimens_surface, specimen.get_color(), radius=specimen.get_body_radius(), center=specimen.get_pos_tuple())
         
         angle_radians = radians(specimen.get_angle_degrees())
         point_x = cos(angle_radians)*specimen.get_sense() + specimen.get_pos_x()
@@ -65,4 +65,4 @@ class Drawer():
         pygame.draw.line(sense_surface, (0,0,0), specimen.get_pos_tuple(), (point_x, point_y))
     
     def __draw_food(self, food: Food, specimens_surface: Surface):
-        pygame.draw.circle(specimens_surface, (246,190,0), radius=food.body_radius, center=(food.get_pos_x(), food.get_pos_y())) 
+        pygame.draw.circle(specimens_surface, (246,190,0), radius=food.get_body_radius(), center=(food.get_pos_x(), food.get_pos_y())) 
